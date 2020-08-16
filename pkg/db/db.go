@@ -3,8 +3,9 @@ package db
 import (
 	"encoding/json"
 	"fmt"
-	"go.etcd.io/bbolt"
 	"reflect"
+
+	"go.etcd.io/bbolt"
 )
 
 type KeyVal struct {

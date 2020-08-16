@@ -3,10 +3,12 @@ package tasks
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"log"
-	"rest_api_sample/pkg/db"
-	"rest_api_sample/pkg/registry"
+
+	"github.com/mirzakhany/rest_api_sample/pkg/db"
+	"github.com/mirzakhany/rest_api_sample/pkg/registry"
+
+	"github.com/google/uuid"
 )
 
 // BucketName repository bucket name
@@ -28,8 +30,8 @@ func New(ctx context.Context) *Repository {
 	if err != nil {
 		log.Panicf("create bucket %s failed: %s", BucketName, err.Error())
 	}
-
-	return &Repository{DBService: dbService}
+	repo = &Repository{DBService: dbService}
+	return repo
 }
 
 func GetRepository() *Repository {

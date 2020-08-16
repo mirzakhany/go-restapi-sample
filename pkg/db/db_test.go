@@ -41,7 +41,6 @@ func TestNew(t *testing.T) {
 		t.Error("create db should fail with invalid path")
 		return
 	}
-
 }
 
 func TestService_Close(t *testing.T) {

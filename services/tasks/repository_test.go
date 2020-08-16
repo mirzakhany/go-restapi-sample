@@ -2,10 +2,26 @@ package tasks
 
 import (
 	"context"
-	"rest_api_sample/pkg/db"
-	"rest_api_sample/pkg/registry"
+	"os"
 	"testing"
+
+	"github.com/mirzakhany/rest_api_sample/pkg/db"
 )
+
+func TestMain(m *testing.M) {
+
+	dbService, err := db.New("/tmp/test_tasks")
+	if err != nil {
+		panic(err)
+	}
+	ctx := context.WithValue(context.Background(), db.ContextKey, dbService)
+	New(ctx)
+
+	code := m.Run()
+
+	_ = os.Remove("/tmp/test_tasks")
+	os.Exit(code)
+}
 
 func TestGetRepository(t *testing.T) {
 	r := GetRepository()
@@ -37,8 +53,6 @@ func TestRepository_Create(t *testing.T) {
 		res.Estimate != task.Estimate || res.Sprint != task.Sprint || res.Assignee != task.Assignee {
 		t.Error("task is not same as original")
 	}
-
-	emptyBucket()
 }
 
 func TestRepository_GetOne(t *testing.T) {
@@ -64,8 +78,6 @@ func TestRepository_GetOne(t *testing.T) {
 		savedTask.Estimate != task.Estimate || savedTask.Sprint != task.Sprint || savedTask.Assignee != task.Assignee {
 		t.Error("task is not same as original")
 	}
-
-	emptyBucket()
 }
 
 func TestRepository_Update(t *testing.T) {
@@ -95,8 +107,6 @@ func TestRepository_Update(t *testing.T) {
 		updatedTask.Assignee != task.Assignee {
 		t.Error("task is not same as last updated task")
 	}
-
-	emptyBucket()
 }
 
 func TestRepository_Delete(t *testing.T) {
@@ -119,7 +129,6 @@ func TestRepository_Delete(t *testing.T) {
 		t.Errorf("error in delete task, %s", err)
 	}
 
-	emptyBucket()
 }
 
 func TestRepository_GetAll(t *testing.T) {
@@ -132,13 +141,13 @@ func TestRepository_GetAll(t *testing.T) {
 		Estimate: "1",
 		Status:   "in-progress",
 		Assignee: "bar",
-	},{
+	}, {
 		Title:    "test2",
 		Sprint:   "bar",
 		Estimate: "2",
 		Status:   "in-backlog",
 		Assignee: "foo",
-	},{
+	}, {
 		Title:    "test3",
 		Sprint:   "bar2",
 		Estimate: "4",
@@ -149,7 +158,7 @@ func TestRepository_GetAll(t *testing.T) {
 	repo := GetRepository()
 
 	for _, task := range tasks {
-		_, err :=repo.Create(task)
+		_, err := repo.Create(task)
 		if err != nil {
 			t.Errorf("error in create task, %s", err)
 		}
@@ -161,11 +170,11 @@ func TestRepository_GetAll(t *testing.T) {
 		t.Errorf("error in loading tasks, %s", err)
 	}
 	if len(savedTasks) != len(tasks) {
-		t.Errorf("result count in not same as input %d != %d", len(savedTasks) , len(tasks))
+		t.Errorf("result count in not same as input %d != %d", len(savedTasks), len(tasks))
 	}
 }
 
-func emptyBucket()  {
+func emptyBucket() {
 	repo := GetRepository()
 	savedTasks, _ := repo.GetAll()
 	for _, t := range savedTasks {
@@ -174,17 +183,4 @@ func emptyBucket()  {
 			panic(err)
 		}
 	}
-}
-
-func init() {
-
-	dbService, err := db.New("/tmp/test_tasks")
-	if err != nil {
-		panic(err)
-	}
-
-	ctx := context.WithValue(context.Background(), db.ContextKey, dbService)
-	registry.Run(ctx)
-
-	emptyBucket()
 }

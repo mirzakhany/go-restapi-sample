@@ -55,7 +55,7 @@ func (s *Service) IsExist(key, bucketName string) (bool, error) {
 		if b == nil {
 			return fmt.Errorf("bucket `%s` not exist", bucketName)
 		}
-		exist = b.Get([]byte(key)) == nil
+		exist = b.Get([]byte(key)) != nil
 		return nil
 	})
 	return exist, err

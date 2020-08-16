@@ -39,6 +39,7 @@ func GetRepository() *Repository {
 func (r *Repository) Create(task Task) (Task, error) {
 	taskID := uuid.New().String()
 	task.ID = taskID
+
 	err := r.DBService.SetJson(taskID, BucketName, task)
 	return task, err
 }
@@ -54,6 +55,7 @@ func (r *Repository) Update(taskID string, task Task) (Task, error) {
 		return Task{}, fmt.Errorf("task not found: %s", taskID)
 	}
 
+	task.ID = taskID
 	err = r.DBService.SetJson(taskID, BucketName, task)
 	if err != nil {
 		return Task{}, err
@@ -96,8 +98,6 @@ func (r *Repository) GetAll() ([]Task, error) {
 }
 
 func init() {
-
-	fmt.Println("tasks repo init")
 	// make sure that our bucket is exit
 	registry.Register(func(ctx context.Context) error {
 		repo = New(ctx)

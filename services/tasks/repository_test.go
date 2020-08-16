@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"context"
-	"fmt"
 	"rest_api_sample/pkg/db"
 	"rest_api_sample/pkg/registry"
 	"testing"
@@ -11,7 +10,7 @@ import (
 func TestGetRepository(t *testing.T) {
 	r := GetRepository()
 	if r == nil {
-		t.Error("repo is null")
+		t.Error("repo is nil")
 	}
 }
 
@@ -38,11 +37,147 @@ func TestRepository_Create(t *testing.T) {
 		res.Estimate != task.Estimate || res.Sprint != task.Sprint || res.Assignee != task.Assignee {
 		t.Error("task is not same as original")
 	}
+
+	emptyBucket()
+}
+
+func TestRepository_GetOne(t *testing.T) {
+
+	var task = Task{
+		Title:    "test1",
+		Sprint:   "bar",
+		Estimate: "1",
+		Status:   "in-progress",
+		Assignee: "foo",
+	}
+
+	res, err := GetRepository().Create(task)
+	if err != nil {
+		t.Errorf("error in create task, %s", err)
+	}
+
+	savedTask, err := GetRepository().GetOne(res.ID)
+	if err != nil {
+		t.Errorf("error in loading task, %s", err)
+	}
+	if savedTask.Title != task.Title || savedTask.Status != task.Status ||
+		savedTask.Estimate != task.Estimate || savedTask.Sprint != task.Sprint || savedTask.Assignee != task.Assignee {
+		t.Error("task is not same as original")
+	}
+
+	emptyBucket()
+}
+
+func TestRepository_Update(t *testing.T) {
+
+	var task = Task{
+		Title:    "test1",
+		Sprint:   "bar",
+		Estimate: "1",
+		Status:   "in-progress",
+		Assignee: "foo",
+	}
+
+	res, err := GetRepository().Create(task)
+	if err != nil {
+		t.Errorf("error in create task, %s", err)
+	}
+
+	task.Title = "new-title-value"
+
+	updatedTask, err := GetRepository().Update(res.ID, task)
+	if err != nil {
+		t.Errorf("error in update task, %s", err)
+	}
+
+	if updatedTask.Title != task.Title || updatedTask.Status != task.Status ||
+		updatedTask.Estimate != task.Estimate || updatedTask.Sprint != task.Sprint ||
+		updatedTask.Assignee != task.Assignee {
+		t.Error("task is not same as last updated task")
+	}
+
+	emptyBucket()
+}
+
+func TestRepository_Delete(t *testing.T) {
+
+	var task = Task{
+		Title:    "test1",
+		Sprint:   "bar",
+		Estimate: "1",
+		Status:   "in-progress",
+		Assignee: "foo",
+	}
+
+	res, err := GetRepository().Create(task)
+	if err != nil {
+		t.Errorf("error in create task, %s", err)
+	}
+
+	err = GetRepository().Delete(res.ID)
+	if err != nil {
+		t.Errorf("error in delete task, %s", err)
+	}
+
+	emptyBucket()
+}
+
+func TestRepository_GetAll(t *testing.T) {
+
+	emptyBucket()
+
+	var tasks = []Task{{
+		Title:    "test1",
+		Sprint:   "bar1",
+		Estimate: "1",
+		Status:   "in-progress",
+		Assignee: "bar",
+	},{
+		Title:    "test2",
+		Sprint:   "bar",
+		Estimate: "2",
+		Status:   "in-backlog",
+		Assignee: "foo",
+	},{
+		Title:    "test3",
+		Sprint:   "bar2",
+		Estimate: "4",
+		Status:   "done",
+		Assignee: "bar",
+	}}
+
+	repo := GetRepository()
+
+	for _, task := range tasks {
+		_, err :=repo.Create(task)
+		if err != nil {
+			t.Errorf("error in create task, %s", err)
+		}
+	}
+
+	savedTasks, err := repo.GetAll()
+
+	if err != nil {
+		t.Errorf("error in loading tasks, %s", err)
+	}
+	if len(savedTasks) != len(tasks) {
+		t.Errorf("result count in not same as input %d != %d", len(savedTasks) , len(tasks))
+	}
+}
+
+func emptyBucket()  {
+	repo := GetRepository()
+	savedTasks, _ := repo.GetAll()
+	for _, t := range savedTasks {
+		err := repo.Delete(t.ID)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func init() {
 
-	fmt.Println("test tasks repo init")
 	dbService, err := db.New("/tmp/test_tasks")
 	if err != nil {
 		panic(err)
@@ -50,4 +185,6 @@ func init() {
 
 	ctx := context.WithValue(context.Background(), db.ContextKey, dbService)
 	registry.Run(ctx)
+
+	emptyBucket()
 }

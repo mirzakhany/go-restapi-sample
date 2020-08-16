@@ -18,10 +18,10 @@ func TestGetRepository(t *testing.T) {
 func TestRepository_Create(t *testing.T) {
 
 	var task = Task{
-		Title: "test1",
-		Sprint: "bar",
+		Title:    "test1",
+		Sprint:   "bar",
 		Estimate: "1",
-		Status: "in-progress",
+		Status:   "in-progress",
 		Assignee: "foo",
 	}
 
@@ -35,16 +35,16 @@ func TestRepository_Create(t *testing.T) {
 	}
 
 	if res.Title != task.Title || res.Status != task.Status ||
-		res.Estimate != task.Estimate || res.Sprint != task.Sprint || res.Assignee != task.Assignee{
+		res.Estimate != task.Estimate || res.Sprint != task.Sprint || res.Assignee != task.Assignee {
 		t.Error("task is not same as original")
 	}
 }
 
-func init()  {
+func init() {
 
 	fmt.Println("test tasks repo init")
 	dbService, err := db.New("/tmp/test_tasks")
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 

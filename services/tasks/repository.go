@@ -39,23 +39,23 @@ func GetRepository() *Repository {
 func (r *Repository) Create(task Task) (Task, error) {
 	taskID := uuid.New().String()
 	task.ID = taskID
-	err := r.DBService.SetJson(taskID,BucketName, task)
+	err := r.DBService.SetJson(taskID, BucketName, task)
 	return task, err
 }
 
 func (r *Repository) Update(taskID string, task Task) (Task, error) {
 
 	ok, err := r.DBService.IsExist(taskID, BucketName)
-	if err != nil{
+	if err != nil {
 		return Task{}, err
 	}
 
-	if !ok{
+	if !ok {
 		return Task{}, fmt.Errorf("task not found: %s", taskID)
 	}
 
 	err = r.DBService.SetJson(taskID, BucketName, task)
-	if err != nil{
+	if err != nil {
 		return Task{}, err
 	}
 
@@ -65,11 +65,11 @@ func (r *Repository) Update(taskID string, task Task) (Task, error) {
 func (r *Repository) Delete(taskID string) error {
 
 	ok, err := r.DBService.IsExist(taskID, BucketName)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
-	if !ok{
+	if !ok {
 		return fmt.Errorf("task not found: %s", taskID)
 	}
 
@@ -80,7 +80,7 @@ func (r *Repository) GetOne(taskID string) (Task, error) {
 
 	var task Task
 	err := r.DBService.GetJson(taskID, BucketName, &task)
-	if err != nil{
+	if err != nil {
 		return Task{}, err
 	}
 	return task, nil
@@ -89,12 +89,11 @@ func (r *Repository) GetOne(taskID string) (Task, error) {
 func (r *Repository) GetAll() ([]Task, error) {
 	var tasks []Task
 	err := r.DBService.GetJsonList(BucketName, &tasks)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return tasks, nil
 }
-
 
 func init() {
 

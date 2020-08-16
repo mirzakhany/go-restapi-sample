@@ -370,8 +370,8 @@ func TestService_SetJsons(t *testing.T) {
 	}
 
 	var user = User{
-			Username: "test1",
-			Email:    "test1@test.com",
+		Username: "test1",
+		Email:    "test1@test.com",
 	}
 
 	err = service.SetJson(user.Username, bucket, user)
@@ -381,7 +381,7 @@ func TestService_SetJsons(t *testing.T) {
 	}
 
 	data, err := service.GetOne(user.Username, bucket)
-	if err != nil || data == nil{
+	if err != nil || data == nil {
 		t.Error("json object not exist in db")
 	}
 }
@@ -473,7 +473,7 @@ func TestService_GetJsonList(t *testing.T) {
 		return
 	}
 
-	for i:=0 ; i< len(users); i ++ {
+	for i := 0; i < len(users); i++ {
 		if users[i].Username != retUsers[i].Username || users[i].Email != retUsers[i].Email {
 			t.Error("returned json list is not same as input")
 		}

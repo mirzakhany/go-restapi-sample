@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"context"
+	"github.com/mirzakhany/rest_api_sample/pkg/projectx"
 	"sort"
 )
 
@@ -10,7 +10,7 @@ var items registryItems
 type registryItems []registryItem
 
 type registryItem struct {
-	function    func(ctx context.Context) error
+	function    func(ctx *projectx.Ctx) error
 	priority    int
 	failOnError bool
 }
@@ -27,7 +27,7 @@ func (r registryItems) Swap(i, j int) {
 	r[i], r[j] = r[j], r[i]
 }
 
-func Register(function func(ctx context.Context) error, priority int, failOnError bool) {
+func Register(function func(ctx *projectx.Ctx) error, priority int, failOnError bool) {
 	items = append(items, registryItem{
 		function:    function,
 		priority:    priority,
@@ -39,7 +39,7 @@ func Flush() {
 	items = nil
 }
 
-func Run(ctx context.Context) (int, []error) {
+func Run(ctx *projectx.Ctx) (int, []error) {
 
 	// sort items
 	sort.Sort(items)

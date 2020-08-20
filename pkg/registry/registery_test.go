@@ -3,18 +3,19 @@ package registry
 import (
 	"context"
 	"fmt"
+	"github.com/mirzakhany/rest_api_sample/pkg/projectx"
 	"testing"
 )
 
 func TestFlush(t *testing.T) {
 
-	ctx := context.Background()
+	ctx := projectx.New(context.Background())
 	// function without error
-	a := func(ctx context.Context) error {
+	a := func(ctx *projectx.Ctx) error {
 		return fmt.Errorf("func error")
 	}
 
-	b := func(ctx context.Context) error {
+	b := func(ctx *projectx.Ctx) error {
 		return fmt.Errorf("func error")
 	}
 
@@ -35,14 +36,14 @@ func TestFlush(t *testing.T) {
 
 func TestRegister(t *testing.T) {
 
-	ctx := context.Background()
+	ctx := projectx.New(context.Background())
 
 	// function without error
-	a := func(ctx context.Context) error {
+	a := func(ctx *projectx.Ctx) error {
 		return nil
 	}
 
-	b := func(ctx context.Context) error {
+	b := func(ctx *projectx.Ctx) error {
 		return fmt.Errorf("func error")
 	}
 
@@ -58,7 +59,7 @@ func TestRegister(t *testing.T) {
 		t.Errorf("expected to run two task but runs: %d", runs)
 	}
 
-	c := func(ctx context.Context) error {
+	c := func(ctx *projectx.Ctx) error {
 		return fmt.Errorf("func c error")
 	}
 

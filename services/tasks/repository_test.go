@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"context"
+	"github.com/mirzakhany/rest_api_sample/pkg/projectx"
 	"os"
 	"testing"
 
@@ -14,7 +15,9 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	ctx := context.WithValue(context.Background(), db.ContextKey, dbService)
+
+	ctx := projectx.New(context.Background())
+	ctx.Set(db.ContextKey, dbService)
 	New(ctx)
 
 	code := m.Run()

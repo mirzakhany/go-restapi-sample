@@ -1,8 +1,8 @@
 package tasks
 
 import (
-	"context"
 	"fmt"
+	"github.com/mirzakhany/rest_api_sample/pkg/projectx"
 	"log"
 
 	"github.com/mirzakhany/rest_api_sample/pkg/db"
@@ -20,11 +20,14 @@ type Repository struct {
 	DBService *db.Service
 }
 
-func New(ctx context.Context) *Repository {
-	dbService, ok := ctx.Value(db.ContextKey).(*db.Service)
+func New(ctx *projectx.Ctx) *Repository {
+
+	i, ok := ctx.Get(db.ContextKey)
 	if !ok {
 		log.Panic("could not get database connection pool from context")
 	}
+
+	dbService := i.(*db.Service)
 
 	_, err := dbService.CreateBucket(BucketName)
 	if err != nil {
@@ -101,8 +104,8 @@ func (r *Repository) GetAll() ([]Task, error) {
 
 func init() {
 	// make sure that our bucket is exit
-	registry.Register(func(ctx context.Context) error {
-		repo = New(ctx)
+	registry.Register(func(ctx *projectx.Ctx) error {
+		New(ctx)
 		return nil
 	}, 5, true)
 }
